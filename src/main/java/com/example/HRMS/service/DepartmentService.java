@@ -27,19 +27,43 @@ public class DepartmentService {
 	public List<Department> viewAll(){
 		return deprepo.findAll();
 	}
-	public Department addEmployeeToDept(Long id,List<Long> employeeId) {
-	  Department dept=	deprepo.findById(id).orElseThrow(()->new ResourceNotFoundException("Department","Department Id",id));
-	  List<Employee> employeeid=employee_repo.findAllById(employeeId);
-	  HashSet<Employee> hashemp=new HashSet<Employee>(employeeid);
-	  if(hashemp.isEmpty()) {
-		  throw new ResourceNotFoundException("Employee", "Employee Ids", 0L); 
-	  }
-	  for (Employee employee : employeeid) {
-		employee.setDepartment(dept);
+	public Department addEmployeeToDept(Long id, List<Long> employeeIds) {
+	    Department dept = deprepo.findById(id)
+	        .orElseThrow(() -> new ResourceNotFoundException("Department", "Department Id", id));
+
+	    List<Employee> employees = employee_repo.findAllById(employeeIds);
+	    if (employees.isEmpty()) {
+	        throw new ResourceNotFoundException("Employee", "Employee Ids", 0L);
+	    }
+
+	    for (Employee employee : employees) {
+	        employee.setDepartment(dept);
+	    }
+
+	    dept.getEmployees().addAll(employees); 
+	    employee_repo.saveAll(employees);
+
+	    return deprepo.save(dept);
 	}
-	  dept.getEmployees().addAll(hashemp);
-	  deprepo.save(dept);
-	  employee_repo.saveAll(employeeid);
-	  return dept;
+	public Department getDepartmentById(Long id) {
+		 Department dept = deprepo.findById(id)
+			        .orElseThrow(() -> new ResourceNotFoundException("Department", "Department Id", id));
+		return dept;
 	}
+	public Boolean deleteDepartment(Long id) {
+		Department dept = deprepo.findById(id)
+		        .orElseThrow(() -> new ResourceNotFoundException("Department", "Department Id", id));
+		
+		if(dept!=null) {
+			 deprepo.delete(dept); 
+			return true;
+			
+		}
+		else {
+			return false;
+		}
+		
+	}
+	
+
 }

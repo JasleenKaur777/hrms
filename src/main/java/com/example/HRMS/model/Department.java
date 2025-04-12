@@ -13,51 +13,58 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
-@Table(name="department")
+@Table(name = "department")
 @Component
 public class Department {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;
+	private Long id;
 	@Column(nullable = false)
-private String name;
-	
-	@OneToMany(mappedBy = "department", cascade = {CascadeType.MERGE,CascadeType.PERSIST},fetch = FetchType.LAZY)
-	
+	@NotBlank(message = "Name is mandatory")
+	private String name;
+
+	@OneToMany(mappedBy = "department", cascade = { CascadeType.MERGE, CascadeType.PERSIST }, fetch = FetchType.LAZY)
+
 	@JsonIgnore
 	List<Employee> employees;
-	
-public Department() {
-	super();
-	// TODO Auto-generated constructor stub
-}
-public Department(String name) {
-	super();
-	this.name = name;
-}
-public List<Employee> getEmployees() {
-	return employees;
-}
-public void setEmployees(List<Employee> employees) {
-	this.employees = employees;
-}
-public Long getId() {
-	return id;
-}
-public void setId(Long id) {
-	this.id = id;
-}
-public String getName() {
-	return name;
-}
-public void setName(String name) {
-	this.name = name;
-}
 
+	public Department() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public Department(String name) {
+		super();
+		this.name = name;
+	}
+
+	public List<Employee> getEmployees() {
+		return employees;
+	}
+
+	public void setEmployees(List<Employee> employees) {
+		this.employees = employees;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 }

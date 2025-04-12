@@ -18,6 +18,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name="employee")
@@ -26,10 +28,14 @@ public class Employee {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(unique = true,nullable = false)
+	@NotBlank(message = "Name is mandatory")
+    @Column(nullable = false, unique = true)
 	private String name;
-	@Column(nullable = false)
+	@NotBlank(message = "Email is mandatory")
+    @Email(message = "Invalid email format")
+    @Column(nullable = false)
 	private String email;
+	 @NotBlank(message = "Position is mandatory")
 	private String position;
 	
 	

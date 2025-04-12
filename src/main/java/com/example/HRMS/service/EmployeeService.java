@@ -27,8 +27,8 @@ public class EmployeeService {
 	@Autowired
 	ProjectRepository projectrepo;
 
-	public void insertEmpl(Employee employee) {
-		emprepo.save(employee);
+	public Employee insertEmpl(Employee employee) {
+		return emprepo.save(employee);
 	}
 
 	public ResponseEntity<String> insertEmployeeProject(Long id, List<Long> projectIds) {

@@ -21,25 +21,27 @@ import com.example.HRMS.model.Employee;
 import com.example.HRMS.model.Project;
 import com.example.HRMS.service.EmployeeService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
 	@Autowired
 	EmployeeService service;
 	@PostMapping("/addempl")
-	public ResponseEntity<String> insertEmpl(@RequestBody Employee employee) {
-		service.insertEmpl(employee);
-		return new ResponseEntity<String>("Employee is inserted",HttpStatus.OK);
+	public ResponseEntity<Employee> insertEmpl(@Valid @RequestBody Employee employee) {
+		Employee emp=service.insertEmpl(employee);
+		return new ResponseEntity<Employee>(emp,HttpStatus.OK);
 	}
 	@GetMapping("/get-all-empl")
 	public List<Employee> viewAll(){
 		return service.getEmployee();
 	}
 	@PutMapping("/update-employee")
-	public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) {
+	public ResponseEntity<Employee> updateEmployee(@Valid @RequestBody Employee employee) {
 		Employee emp=service.updateEmployee(employee);
 		if(emp!=null) {
-			return ResponseEntity.ok(emp);
+			return new ResponseEntity<Employee>(emp,HttpStatus.OK);
 		}
 		else {
 			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
