@@ -10,5 +10,5 @@ import com.example.HRMS.model.Project;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-List<Employee> findByProjectlist(List<Project> projectlist);
+
 }

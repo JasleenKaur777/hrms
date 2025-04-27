@@ -27,7 +27,7 @@ private Long id;
 	@Column(nullable = false)
 private String name;
 private String description;
-@ManyToMany(mappedBy = "projectlist", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+@ManyToMany(mappedBy = "projects", fetch = FetchType.LAZY)
 private List<Employee> employees;
 public Project(Long id, String name, String description) {
 	super();

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.HRMS.DTO.EmployeeDTO;
-import com.example.HRMS.DTO.EmployeeProject;
 import com.example.HRMS.model.Employee;
 import com.example.HRMS.model.Project;
 import com.example.HRMS.service.EmployeeService;
@@ -42,6 +41,11 @@ public class EmployeeController {
 	@GetMapping("/get-all-empl")
 	public List<EmployeeDTO> viewAll(){
 		return service.getEmployee();
+	}
+	@GetMapping("/get-employee/{id}")
+	public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id){
+		EmployeeDTO dto=service.getEmployeeById(id);
+		return new ResponseEntity<EmployeeDTO>(dto,HttpStatus.ACCEPTED);
 	}
 //	@PutMapping("/update-employee")
 //	public ResponseEntity<Employee> updateEmployee(@Valid @RequestBody Employee employee) {

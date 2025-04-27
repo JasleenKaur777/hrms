@@ -28,10 +28,19 @@ ProjectService service;
 		ProjectDTO dto= service.addProject(project);
 		return new ResponseEntity<ProjectDTO>(dto,HttpStatus.ACCEPTED);
 	}
-//	@GetMapping("/getproject")
-//	public List<Project> viewAll(){
-//		return service.viewAll();
-//	}
+	@PutMapping("/project/{projectId}/employee/{employeeId}")
+	public ResponseEntity<ProjectDTO> addEmployeeToProject(
+	        @PathVariable Long projectId,
+	        @PathVariable Long employeeId) {
+	    ProjectDTO projectDTO = service.addEmployeeToProject(projectId, employeeId);
+	    return new ResponseEntity<>(projectDTO, HttpStatus.OK);
+	}
+
+	@GetMapping("/getproject")
+	public ResponseEntity<List<ProjectDTO>> viewAll(){
+	 List<ProjectDTO> dtos= service.viewAll();
+	 return new ResponseEntity<List<ProjectDTO>>(dtos,HttpStatus.ACCEPTED);
+	}
 //	@DeleteMapping("/delete-project/{id}")
 //	public ResponseEntity<String> deleteProject(@PathVariable Long id){
 //		return service.deleteProject(id);

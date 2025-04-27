@@ -39,13 +39,12 @@ public class Employee {
 	private String position;
 	
 	
-	 @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+	 @ManyToMany
 	    @JoinTable(
-	        name = "employee_project",
-	        joinColumns = @JoinColumn(name = "employee_id"),
-	        inverseJoinColumns = @JoinColumn(name = "project_id")
-	    )
-	List<Project> projectlist;
+	        name = "employee_project", 
+	        joinColumns = @JoinColumn(name = "employee_id"), 
+	        inverseJoinColumns = @JoinColumn(name = "project_id"))
+	List<Project> projects;
 	 
 	 @ManyToOne
 	 @JoinColumn(name = "department_id")
@@ -65,11 +64,11 @@ public class Employee {
 	}
 	
 	public List<Project> getProjectlist() {
-		return projectlist;
+		return projects;
 	}
 
-	public void setProjectlist(List<Project> projectlist) {
-		this.projectlist = projectlist;
+	public void setProjectlist(List<Project> projects) {
+		this.projects = projects;
 	}
 
 	public Employee(Long id, String name, String email, String position) {

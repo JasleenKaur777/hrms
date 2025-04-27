@@ -22,8 +22,7 @@ public class DepartmentService {
 	@Autowired
 	DepartmentRepository deprepo;
 	
-	@Autowired
-	EmployeeRepository employee_repo;
+	
 	
 	@Autowired
 	ModelMapper mapper;

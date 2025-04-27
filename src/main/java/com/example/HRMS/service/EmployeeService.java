@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.example.HRMS.DTO.EmployeeDTO;
-import com.example.HRMS.DTO.EmployeeProject;
 import com.example.HRMS.DTO.ProjectDTO;
 import com.example.HRMS.dao.DepartmentRepository;
 import com.example.HRMS.dao.EmployeeRepository;
@@ -52,15 +51,11 @@ public class EmployeeService {
 	    emp.setEmail(employee.getEmail());
 	    emp.setName(employee.getName());
 	    emp.setPosition(employee.getPosition());
-
-	    // ✅ Use the actual Project entity directly
 	    List<Project> projectList = new ArrayList<>();
 	    projectList.add(project);
 	    emp.setProjectlist(projectList);
 
 	    Employee savedEmp = emprepo.save(emp);
-
-	    // ✅ Ensure ModelMapper handles nested mapping
 	    return mapper.map(savedEmp, EmployeeDTO.class);
 	}
 	public EmployeeDTO createEmpl(EmployeeDTO employee ) {
@@ -75,38 +70,31 @@ public class EmployeeService {
 	  
 
 	    Employee savedEmp = emprepo.save(emp);
-
-	    // ✅ Ensure ModelMapper handles nested mapping
 	    return mapper.map(savedEmp, EmployeeDTO.class);
 	}
 
-
-//	public ResponseEntity<String> insertEmployeeProject(Long id, List<Long> projectIds) {
-//		Optional<Employee> empOpt = emprepo.findById(id);
-//
-//		if (!empOpt.isPresent()) {
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found");
-//		}
-//
-//		Employee employee = empOpt.get();
-//		List<Project> projectList = projectrepo.findAllById(projectIds);
-//		Set<Project> projectset=new HashSet<Project>(projectList);
-//
-//		if (projectset.isEmpty()) {
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No valid projects found for the given IDs.");
-//		}
-//		employee.getProjectlist().addAll(projectset);
-//
-//		emprepo.save(employee);
-//
-//		return ResponseEntity.status(HttpStatus.OK).body("Projects successfully assigned to Employee with ID: " + id);
-//	}
-//
 	public List<EmployeeDTO> getEmployee() {
 		List<Employee> employees=emprepo.findAll();
 		List<EmployeeDTO> dtos=employees.stream().map(emp->mapper.map(emp, EmployeeDTO.class)).collect(Collectors.toList());
 		return dtos;
 	}
+	
+	public EmployeeDTO getEmployeeById(Long id) {
+	    Employee employee = emprepo.findById(id)
+	        .orElseThrow(() -> new ResourceNotFoundException("Employee", "Employee ID", id));
+
+	    // Convert Employee to EmployeeDTO, including projects
+	    EmployeeDTO employeeDTO = mapper.map(employee, EmployeeDTO.class);
+	    List<ProjectDTO> projectDTOs = employee.getProjectlist()
+	        .stream()
+	        .map(project -> mapper.map(project, ProjectDTO.class))
+	        .collect(Collectors.toList());
+
+	    
+
+	    return employeeDTO;
+	}
+
 //
 //	public Employee updateEmployee(Employee employee) {
 //		Optional<Employee> empopt = emprepo.findById(employee.getId());
