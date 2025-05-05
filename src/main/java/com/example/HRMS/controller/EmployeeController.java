@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,54 +29,63 @@ import jakarta.validation.Valid;
 public class EmployeeController {
 	@Autowired
 	EmployeeService service;
-	@PostMapping("/addempl/dept-id/{departmentid}/project-id/{projectid}")
-	public ResponseEntity<EmployeeDTO> insertEmpl(@Valid @RequestBody EmployeeDTO employee ,@PathVariable Long departmentid,@PathVariable Long projectid) {
-		EmployeeDTO emp=service.insertEmpl(employee, departmentid, projectid);
-		return new ResponseEntity<EmployeeDTO>(emp,HttpStatus.OK);
-	}
-	@PostMapping("create-employee")
-	public ResponseEntity<EmployeeDTO> createEmpl(@Valid @RequestBody EmployeeDTO employee ) {
-		EmployeeDTO emp=service.createEmpl(employee);
-		return new ResponseEntity<EmployeeDTO>(emp,HttpStatus.OK);
+	@PostMapping("/api/employees")
+	public ResponseEntity<EmployeeDTO> insertEmployee(
+	        @Valid @RequestBody EmployeeDTO employee,
+	        @RequestParam Long departmentId,
+	        @RequestParam List<Long> projectIds) {
+
+	    EmployeeDTO savedEmployee = service.insertEmployeeWithProjects(employee, departmentId, projectIds);
+	    return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
 	}
 	@GetMapping("/get-all-empl")
 	public List<EmployeeDTO> viewAll(){
 		return service.getEmployee();
 	}
 	@GetMapping("/get-employee/{id}")
-	public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id){
-		EmployeeDTO dto=service.getEmployeeById(id);
-		return new ResponseEntity<EmployeeDTO>(dto,HttpStatus.ACCEPTED);
-	}
-//	@PutMapping("/update-employee")
-//	public ResponseEntity<Employee> updateEmployee(@Valid @RequestBody Employee employee) {
-//		Employee emp=service.updateEmployee(employee);
-//		if(emp!=null) {
-//			return new ResponseEntity<Employee>(emp,HttpStatus.OK);
-//		}
-//		else {
-//			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
-//		}
-//	}
-//	@DeleteMapping("/delete-employee/{id}")
-//	public ResponseEntity<String> deleteEmployee(@PathVariable Long id){
-//		return service.deleteEmployee(id);
-//		
-//	}
-//	@PutMapping("/add-project-emp/{id}")
-//	public ResponseEntity<String> insertEmployeeProject(@PathVariable Long id, @RequestBody List<Long> projectIds) {
-//	    return service.insertEmployeeProject(id, projectIds);
-//	}
-//	@GetMapping("/get-employee-project/{id}")
-//	public ResponseEntity<EmployeeProject> getEmployeeProject(@PathVariable Long id) {
-//		EmployeeProject emp=service.getEmployeeProject(id);
-//		if(emp!=null) {
-//			return ResponseEntity.ok(emp);
-//		}
-//		else {
-//			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
-//		}
-//	}
+	 public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
+        EmployeeDTO employee = service.getEmployeeById(id);
+        return ResponseEntity.ok(employee);
+    }
+	 @PutMapping("/{id}")
+	    public ResponseEntity<EmployeeDTO> updateEmployee(
+	            @PathVariable Long id,
+	            @RequestParam Long departmentId,
+	            @RequestParam List<Long> projectIds,
+	            @RequestBody EmployeeDTO updatedEmployee) {
+	        EmployeeDTO result = service.updateEmployee(id, departmentId, projectIds, updatedEmployee);
+	        return ResponseEntity.ok(result);
+	    }
 
+	    @DeleteMapping("/{id}")
+	    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+	        service.deleteEmployee(id);
+	        return ResponseEntity.noContent().build();
+	    }
+
+	    @PutMapping("/{id}/assign-projects")
+	    public ResponseEntity<EmployeeDTO> assignProjectsToEmployee(
+	            @PathVariable Long id, @RequestBody List<Long> projectIds) {
+	        EmployeeDTO result = service.assignProjects(id, projectIds);
+	        return ResponseEntity.ok(result);
+	    }
+
+	    @PutMapping("/{id}/assign-department/{deptId}")
+	    public ResponseEntity<EmployeeDTO> assignDepartmentToEmployee(
+	            @PathVariable Long id, @PathVariable Long deptId) {
+	        EmployeeDTO result = service.assignDepartment(id, deptId);
+	        return ResponseEntity.ok(result);
+	    }
+
+	    @GetMapping("/by-project/{projectId}")
+	    public ResponseEntity<List<EmployeeDTO>> getEmployeesByProject(@PathVariable Long projectId) {
+	        return ResponseEntity.ok(service.getEmployeesByProject(projectId));
+	    }
+
+	    @GetMapping("/by-department/{deptId}")
+	    public ResponseEntity<List<EmployeeDTO>> getEmployeesByDepartment(@PathVariable Long deptId) {
+	        return ResponseEntity.ok(service.getEmployeesByDepartment(deptId));
+	    }
+		
 
 }

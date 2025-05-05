@@ -39,100 +39,76 @@ public class EmployeeService {
 	@Autowired
 	ModelMapper mapper;
 
-	public EmployeeDTO insertEmpl(EmployeeDTO employee , Long departmentid, Long projectid) {
-	    Department dept = deptrepo.findById(departmentid)
-	        .orElseThrow(() -> new ResourceNotFoundException("Department", "Department id", departmentid));
+	public EmployeeDTO insertEmployeeWithProjects(EmployeeDTO employee, Long departmentId, List<Long> projectIds) {
+	    Department dept = deptrepo.findById(departmentId)
+	        .orElseThrow(() -> new ResourceNotFoundException("Department", "Department ID", departmentId));
 
-	    Project project = projectrepo.findById(projectid)
-	        .orElseThrow(() -> new ResourceNotFoundException("Project", "projectid", projectid));
+	    List<Project> projects = projectrepo.findAllById(projectIds);
+	    if (projects.size() != projectIds.size()) {
+	        throw new ResourceNotFoundException("Project", "Project id", projectIds);
+	    }
 
 	    Employee emp = new Employee();
+	    emp.setName(employee.getName());
+	    emp.setEmail(employee.getEmail());
+	    emp.setPosition(employee.getPosition());
 	    emp.setDepartment(dept);
-	    emp.setEmail(employee.getEmail());
-	    emp.setName(employee.getName());
-	    emp.setPosition(employee.getPosition());
-	    List<Project> projectList = new ArrayList<>();
-	    projectList.add(project);
-	    emp.setProjectlist(projectList);
+	    emp.setProjectlist(projects);
 
-	    Employee savedEmp = emprepo.save(emp);
-	    return mapper.map(savedEmp, EmployeeDTO.class);
+	    Employee saved = emprepo.save(emp);
+	    return mapper.map(saved, EmployeeDTO.class);
 	}
-	public EmployeeDTO createEmpl(EmployeeDTO employee ) {
-	   
-
-	    Employee emp = new Employee();
-	   
-	    emp.setEmail(employee.getEmail());
-	    emp.setName(employee.getName());
-	    emp.setPosition(employee.getPosition());
-
-	  
-
-	    Employee savedEmp = emprepo.save(emp);
-	    return mapper.map(savedEmp, EmployeeDTO.class);
-	}
-
 	public List<EmployeeDTO> getEmployee() {
 		List<Employee> employees=emprepo.findAll();
 		List<EmployeeDTO> dtos=employees.stream().map(emp->mapper.map(emp, EmployeeDTO.class)).collect(Collectors.toList());
 		return dtos;
 	}
-	
 	public EmployeeDTO getEmployeeById(Long id) {
 	    Employee employee = emprepo.findById(id)
-	        .orElseThrow(() -> new ResourceNotFoundException("Employee", "Employee ID", id));
-
-	    // Convert Employee to EmployeeDTO, including projects
-	    EmployeeDTO employeeDTO = mapper.map(employee, EmployeeDTO.class);
-	    List<ProjectDTO> projectDTOs = employee.getProjectlist()
-	        .stream()
-	        .map(project -> mapper.map(project, ProjectDTO.class))
-	        .collect(Collectors.toList());
-
-	    
-
-	    return employeeDTO;
+	        .orElseThrow(() -> new ResourceNotFoundException("Employee", "ID", id));
+	    return mapper.map(employee, EmployeeDTO.class);
 	}
 
-//
-//	public Employee updateEmployee(Employee employee) {
-//		Optional<Employee> empopt = emprepo.findById(employee.getId());
-//		if (empopt.isPresent()) {
-//			Employee emp = empopt.get();
-//			emp.setId(employee.getId());
-//			emp.setName(employee.getName());
-//			emp.setEmail(employee.getEmail());
-//			emp.setPosition(employee.getPosition());
-//			emprepo.save(emp);
-//			return emp;
-//		} else {
-//			return null;
-//		}
-//
-//	}
-//
-//	public ResponseEntity<String> deleteEmployee(Long id) {
-//		Optional<Employee> empopt = emprepo.findById(id);
-//		if (empopt.isPresent()) {
-//			Employee emp = empopt.get();
-//			emprepo.delete(emp);
-//
-//			return new ResponseEntity<String>("Employee is deleted", HttpStatus.ACCEPTED);
-//		}
-//		return new ResponseEntity<String>("Employee is not deleted", HttpStatus.NOT_FOUND);
-//	}
-//
-//	public EmployeeProject getEmployeeProject(Long id) {
-//          Optional<Employee> empopt=  emprepo.findById(id);
-//          if(empopt.isPresent()) {
-//        	Employee emp=  empopt.get();
-//        	EmployeeProject emp_project=new EmployeeProject(emp);
-//        	return emp_project;
-//          }
-//          else {
-//        	  return null;
-//          }
-//	}
+	public EmployeeDTO updateEmployee(Long id, Long deptId, List<Long> projectIds, EmployeeDTO dto) {
+        Employee employee = emprepo.findById(id).orElseThrow();
+        employee.setName(dto.getName());
+        employee.setEmail(dto.getEmail());
+        employee.setPosition(dto.getPosition());
 
+        Department department = deptrepo.findById(deptId).orElseThrow();
+        employee.setDepartment(department);
+
+        List<Project> projects = projectrepo.findAllById(projectIds);
+        employee.setProjects(projects);
+
+        return mapper.map(emprepo.save(employee), EmployeeDTO.class);
+    }
+
+    public void deleteEmployee(Long id) {
+        emprepo.deleteById(id);
+    }
+
+    public EmployeeDTO assignProjects(Long id, List<Long> projectIds) {
+        Employee employee = emprepo.findById(id).orElseThrow();
+        List<Project> projects = projectrepo.findAllById(projectIds);
+        employee.setProjects(projects);
+        return mapper.map(emprepo.save(employee), EmployeeDTO.class);
+    }
+
+    public EmployeeDTO assignDepartment(Long id, Long deptId) {
+        Employee employee = emprepo.findById(id).orElseThrow();
+        Department department = deptrepo.findById(deptId).orElseThrow();
+        employee.setDepartment(department);
+        return mapper.map(emprepo.save(employee), EmployeeDTO.class);
+    }
+
+    public List<EmployeeDTO> getEmployeesByProject(Long projectId) {
+        Project project = projectrepo.findById(projectId).orElseThrow();
+        return project.getEmployees().stream().map(e -> mapper.map(e, EmployeeDTO.class)).collect(Collectors.toList());
+    }
+
+    public List<EmployeeDTO> getEmployeesByDepartment(Long deptId) {
+        Department dept = deptrepo.findById(deptId).orElseThrow();
+        return dept.getEmployees().stream().map(e -> mapper.map(e, EmployeeDTO.class)).collect(Collectors.toList());
+    }
 }

@@ -110,6 +110,14 @@ public class Employee {
 	public void setPosition(String position) {
 		this.position = position;
 	}
+
+	public List<Project> getProjects() {
+		return projects;
+	}
+
+	public void setProjects(List<Project> projects) {
+		this.projects = projects;
+	}
 	
 
 }
